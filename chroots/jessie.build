@@ -1,0 +1,93 @@
+#!/bin/bash
+
+export UROOT=/data/data/u.root
+export CHROOT=jessie
+export ARCH=armhf
+export TRIPLE=arm-linux-gnueabihf
+export ELFINT=/lib/${TRIPLE}/ld-2.19.so
+
+
+mkdir -p ${CHROOT}
+if [ -f  "${CHROOT}/sdk" ]
+then
+    echo bootstrap done
+
+    if [ -d "u.root.base" ]
+    then
+        /bin/cp -aRf u.root.base/* ./${CHROOT}/
+        chmod -R 755 ${CHROOT}${UROOT}/bin
+    fi
+
+    for mnt in dev/pts dev proc tmp sys
+    do
+	        umount -f ${CHROOT}/$mnt 2>/dev/null
+    done
+
+    for mnt in proc tmp sys dev dev/pts
+    do
+	    mkdir -p ${CHROOT}/$mnt
+	    mount --bind /$mnt ${CHROOT}/$mnt
+    done
+
+    export debian_chroot=\(${ARCH}\)${CHROOT}
+    export INPUTRC=${UROOT}/etc/inputrc
+    export HOME=${UROOT}
+
+    for ENV in $(env|grep ^LC_|cut -f1 -d=)
+    do
+	    unset $ENV
+    done
+
+    unset LANGUAGE
+    export LANG=C.UTF-8
+    export LC_ALL=C
+    export WORKDIR=/usr/src
+
+    LD_LIBRARY_PATH=${UROOT}/lib/{TRIPLE} \
+        PATH=/usr/sbin:/usr/bin:/sbin:/bin:${UROOT}/bin \
+        /usr/sbin/chroot ${CHROOT} /bin/bash --rcfile ${UROOT}/etc/bash.bashrc
+
+
+    chroot ${CHROOT} $1 $2 $3 $4 $5 $6 $7 $8 $9
+
+    for mnt in dev/pts dev proc tmp sys
+    do
+	    umount -f ${CHROOT}/$mnt || echo $mnt was not mounted
+    done
+
+else
+    cd ${CHROOT}
+    apt update && apt upgrade
+    apt install debian-archive-keyring ubuntu-dev-tools debootstrap qemu-user-static git
+
+    mkdir -p usr/bin usr/sbin
+    cp -vf /usr/bin/qemu-arm-static usr/bin/qemu-arm-static
+
+    debootstrap --arch=${ARCH} ${CHROOT} $(pwd) http://httpredir.debian.org/debian/
+
+    #git clone should bring those
+    if [ -d "u.root.base" ]
+    then
+        /bin/cp -aRf u.root.base/* ./${CHROOT}/
+        chmod -R 755 ${CHROOT}${UROOT}/bin
+    fi
+
+    mkdir -p ".${UROOT}/lib/{TRIPLE}"
+    cp -vf ".${UROOT}/etc/passwd" etc/
+    cp -vf ".${ELFINT}" ".${UROOT}/ldl.so"
+
+
+    echo "ZWNobyAiKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqIiA+JjIKZWNobyAiQWxsIHJjLmQgb3BlcmF0aW9ucyBkZW5pZWQgYnkgcG9saWN5IiA+JjIKZWNobyAiKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqIiA+JjIKZXhpdCAxMDEKCg==" | base64 -d > usr/sbin/policy-rc.d
+
+    chmod 755 usr/sbin/policy-rc.d
+    echo "deb http://httpredir.debian.org/debian ${CHROOT} main contrib non-free" > etc/apt/source.list
+    echo "deb http://httpredir.debian.org/debian ${CHROOT}-updates main contrib non-free" >> etc/apt/source.list
+    echo "deb http://httpredir.debian.org/debian ${CHROOT}-backports main contrib non-free" >> etc/apt/source.list
+    echo "deb http://httpredir.debian.org/debian ${CHROOT}/updates main contrib non-free" >> etc/apt/source.list
+
+    touch sdk
+    cd ..
+    echo "now, run sudo $0 again to enter chroot"
+fi
+
+
