@@ -67,6 +67,6 @@ $endif
 
 $if term=linux
 #"\C-l": "\ec\e[H\e[J"
-"\C-l": 'clear;\n'
+"\C-l": '\C-aclear;\n'
 $endif
 
