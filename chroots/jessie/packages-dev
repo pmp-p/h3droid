@@ -145,3 +145,7 @@ x11proto-xf86vidmode-dev
 x11proto-xinerama-dev				
 xtrans-dev					
 zlib1g-dev:armhf				
+libsqlite3-dev
+libmpdec-dev
+libreadline-dev
+libclang-3.5-dev

@@ -1,8 +1,10 @@
 apt-get update
 apt-get upgrade
-apt-get -y install build-essential autoconf automake autotools-dev pkg-config checkinstall cmake \
- python-support python2.7 python2.7-dev
+apt-get -y install build-essential autoconf automake autotools-dev pkg-config checkinstall cmake libtool \
+ python-support python2.7 python2.7-dev cython python-llvm llvm-3.5 swig2.0 clang git
 apt-get clean
 
 apt-get -y install $(cat /packages-dev)
 apt-get clean
+cp /libtool /usr/bin/
+ln -sf /usr/lib/llvm-3.5/bin/llvm-config /usr/bin/
