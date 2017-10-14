@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BEGIN_INCLUDE(manifest) -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="u.r.p3d"
+    android:versionCode="1"
+    android:versionName="1.0"
+    android:sharedUserId="u.root"
+    >
+    <uses-sdk android:minSdkVersion="19" />
+    <application
+        android:label="Panda Runtime"
+        android:hasCode="true"
+    >
+        <activity
+            android:name="EglRuntime"
+            android:label="Panda Runtime"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:configChanges="orientation|keyboardHidden"
+        >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
+<!-- END_INCLUDE(manifest) -->

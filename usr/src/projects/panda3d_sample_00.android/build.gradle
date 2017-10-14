@@ -1,0 +1,54 @@
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.14+'
+        //classpath 'com.android.tools.build:gradle:2.1.3'
+    }
+}
+
+apply plugin: 'com.android.application'
+
+def lib_crystax = "/data/data/u.root/lib-armhf/libcrystax.so"
+def lib_bthread = "/data/data/u.root/lib-armhf/libbthread.so"
+def lib_python =  "/data/data/u.root/lib-armhf/libpython3.5m.so"
+
+def ld_arm = "-L/data/data/u.root/lib-armhf"
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "23.0.3"
+
+
+    sourceSets.main {
+        jniLibs.srcDir "./libs/armeabi-v7a"
+    }
+
+    task ndkBuild(type: Exec) {
+        commandLine './ndk-build.tmp'
+    }
+   tasks.withType(JavaCompile) {
+        compileTask -> compileTask.dependsOn ndkBuild
+    }
+
+
+    defaultConfig {
+        ndk {
+            abiFilters 'armeabi-v7a'
+            moduleName "nativeegl"
+            ldLibs "z", "log", "android", "EGL", "GLESv1_CM", "python3.5m", "crystax -fPIE -L/data/data/u.root/lib-armhf"
+            cFlags = "-fPIE -std=c++11 -pthread -frtti -fexceptions -I/data/data/u.root/usr/include/python3.5m"
+        }
+    }
+
+
+}
+
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2'
+}
+
