@@ -97,10 +97,7 @@ public class EglRuntime extends Activity implements SurfaceHolder.Callback
     public static native void nativeSetSurface(Surface surface);
 
     static {
-        //System.loadLibrary("crystax");
-        //System.loadLibrary("z");
-        //System.loadLibrary("python3.5m");
-        System.loadLibrary("nativeegl");
+        System.loadLibrary("eglruntime");
     }
 
 }
