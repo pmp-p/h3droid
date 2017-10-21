@@ -21,10 +21,61 @@
 #include <EGL/egl.h> // requires ndk r5 or newer
 #include <GLES/gl.h>
 
-#include "logger.h"
-#include "renderer.h"
+#include <pthread.h>
+#include <EGL/egl.h> // requires ndk r5 or newer
+#include <GLES/gl.h>
 
+
+#include "logger.h"
 #define LOG_TAG "EglSample"
+
+class Renderer {
+
+public:
+    Renderer();
+    virtual ~Renderer();
+
+    // Following methods can be called from any thread.
+    // They send message to render thread which executes required actions.
+    void start();
+    void stop();
+    void setWindow(ANativeWindow* window);
+
+
+private:
+
+    enum RenderThreadMessage {
+        MSG_NONE = 0,
+        MSG_WINDOW_SET,
+        MSG_RENDER_LOOP_EXIT
+    };
+
+    pthread_t _threadId;
+    pthread_mutex_t _mutex;
+    enum RenderThreadMessage _msg;
+
+    // android window, supported by NDK r5 and newer
+    ANativeWindow* _window;
+
+    EGLDisplay _display;
+    EGLSurface _surface;
+    EGLContext _context;
+    GLfloat _angle;
+
+    // RenderLoop is called in a rendering thread started in start() method
+    // It creates rendering context and renders scene until stop() is called
+    void renderLoop();
+
+    bool initialize();
+    void destroy();
+
+    void drawFrame();
+
+    // Helper method for starting the thread
+    static void* threadStartCallback(void *myself);
+
+};
+
 
 static GLint vertices[][3] = {
     { -0x10000, -0x10000, -0x10000 },
@@ -62,7 +113,7 @@ Renderer::Renderer()
     : _msg(MSG_NONE), _display(0), _surface(0), _context(0), _angle(0)
 {
     LOG_INFO("Renderer instance created");
-    pthread_mutex_init(&_mutex, 0);    
+    pthread_mutex_init(&_mutex, 0);
     return;
 }
 
@@ -87,7 +138,7 @@ void Renderer::stop()
     // send message to render thread to stop rendering
     pthread_mutex_lock(&_mutex);
     _msg = MSG_RENDER_LOOP_EXIT;
-    pthread_mutex_unlock(&_mutex);    
+    pthread_mutex_unlock(&_mutex);
 
     pthread_join(_threadId, 0);
     LOG_INFO("Renderer thread stopped");
@@ -111,7 +162,7 @@ void Renderer::setWindow(ANativeWindow *window)
 void Renderer::renderLoop()
 {
     bool renderingEnabled = true;
-    
+
     LOG_INFO("renderLoop()");
 
     while (renderingEnabled) {
@@ -134,19 +185,19 @@ void Renderer::renderLoop()
                 break;
         }
         _msg = MSG_NONE;
-        
+
         if (_display) {
             drawFrame();
             if (!eglSwapBuffers(_display, _surface)) {
                 LOG_ERROR("eglSwapBuffers() returned error %d", eglGetError());
             }
         }
-        
+
         pthread_mutex_unlock(&_mutex);
     }
-    
+
     LOG_INFO("Render loop exits");
-    
+
     return;
 }
 
@@ -160,7 +211,7 @@ bool Renderer::initialize()
         EGL_NONE
     };
     EGLDisplay display;
-    EGLConfig config;    
+    EGLConfig config;
     EGLint numConfigs;
     EGLint format;
     EGLSurface surface;
@@ -168,9 +219,9 @@ bool Renderer::initialize()
     EGLint width;
     EGLint height;
     GLfloat ratio;
-    
+
     LOG_INFO("Initializing context");
-    
+
     if ((display = eglGetDisplay(EGL_DEFAULT_DISPLAY)) == EGL_NO_DISPLAY) {
         LOG_ERROR("eglGetDisplay() returned error %d", eglGetError());
         return false;
@@ -199,13 +250,13 @@ bool Renderer::initialize()
         destroy();
         return false;
     }
-    
+
     if (!(context = eglCreateContext(display, config, 0, 0))) {
         LOG_ERROR("eglCreateContext() returned error %d", eglGetError());
         destroy();
         return false;
     }
-    
+
     if (!eglMakeCurrent(display, surface, surface, context)) {
         LOG_ERROR("eglMakeCurrent() returned error %d", eglGetError());
         destroy();
@@ -229,7 +280,7 @@ bool Renderer::initialize()
     glEnable(GL_CULL_FACE);
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
-    
+
     glViewport(0, 0, width, height);
 
     ratio = (GLfloat) width / height;
@@ -247,7 +298,7 @@ void Renderer::destroy() {
     eglDestroyContext(_display, _context);
     eglDestroySurface(_display, _surface);
     eglTerminate(_display);
-    
+
     _display = EGL_NO_DISPLAY;
     _surface = EGL_NO_SURFACE;
     _context = EGL_NO_CONTEXT;
@@ -267,13 +318,13 @@ void Renderer::drawFrame()
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
-    
+
     glFrontFace(GL_CW);
     glVertexPointer(3, GL_FIXED, 0, vertices);
     glColorPointer(4, GL_FIXED, 0, colors);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_BYTE, indices);
 
-    _angle += 1.2f;    
+    _angle += 1.2f;
 }
 
 void* Renderer::threadStartCallback(void *myself)
@@ -282,7 +333,7 @@ void* Renderer::threadStartCallback(void *myself)
 
     renderer->renderLoop();
     pthread_exit(0);
-    
+
     return 0;
 }
 

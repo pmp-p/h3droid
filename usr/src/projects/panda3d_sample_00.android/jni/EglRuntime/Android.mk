@@ -14,8 +14,8 @@ include $(PREBUILT_SHARED_LIBRARY)
 
 
 include $(CLEAR_VARS)
-LOCAL_MODULE    := nativeegl
-LOCAL_SRC_FILES := cpython35m.cpp jniapi.cpp renderer.cpp
+LOCAL_MODULE    := eglruntime
+LOCAL_SRC_FILES := jniapi.cpp
 LOCAL_LDLIBS := -lz -ldl -lc -lm -llog -lEGL -landroid -lGLESv1_CM
 LOCAL_SHARED_LIBRARIES := python3.5m crystax
 include $(BUILD_SHARED_LIBRARY)
