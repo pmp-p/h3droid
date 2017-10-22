@@ -1,0 +1,11 @@
+--- /data/data/u.r/usr/lib/python3.5/distutils/command/build_ext.py.orig
++++ /data/data/u.r/usr/lib/python3.5/distutils/command/build_ext.py
+@@ -748,7 +748,7 @@
+             if sysconfig.get_config_var('Py_ENABLE_SHARED'):
+                 pythonlib = 'python{}.{}{}'.format(
+                     sys.hexversion >> 24, (sys.hexversion >> 16) & 0xff,
+-                    sys.abiflags)
++                    'm')
+                 return ext.libraries + [pythonlib]
+             else:
+                 return ext.libraries
