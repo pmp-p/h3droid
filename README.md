@@ -10,8 +10,11 @@
 ### Installation
   https://h3droid.com/h3ii
 
+
+
 ### Wiki
   https://github.com/kotc/h3droid/wiki
+
 
 
 ### This SDK currently provides :
@@ -23,10 +26,11 @@
   micropython
   libffi
   c2ffi
+
+
   
-  
-### English Support, french on request.
-  Freenode irc channel #H3DRoid
+### English Support, french on request :
+  Freenode irc channel #H3Droid
   
 
 SPDX-License-Identifier: 
