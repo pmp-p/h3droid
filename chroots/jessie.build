@@ -1,4 +1,5 @@
 #!/bin/bash
+clear
 
 export UROOT=/data/data/u.root
 export CHROOT=jessie
@@ -10,27 +11,45 @@ export ELFINT=/lib/${TRIPLE}/ld-2.19.so
 mkdir -p ${CHROOT}
 if [ -f  "${CHROOT}/sdk" ]
 then
-    echo bootstrap done
-
-    if [ -d "u.root.base" ]
+    if [ -d jessie/proc/1 ]
     then
-        /bin/cp -aRf u.root.base/* ./${CHROOT}/
-        chmod -R 755 ${CHROOT}${UROOT}/bin
+        echo re-enter
+    else
+        echo bootstrap done
+
+        for mnt in dev/pts dev proc tmp sys data/data/u.root
+        do
+	        umount -f ${CHROOT}/$mnt 2>/dev/null
+        done
+
+        for mnt in proc tmp sys dev dev/pts
+        do
+	    mkdir -p ${CHROOT}/$mnt
+    	    mount --bind /$mnt ${CHROOT}/$mnt
+        done
+
+        if [ -d "u.root.base" ]
+        then
+            echo "bootstrap mode"
+            /bin/cp -aRf u.root.base/* ./${CHROOT}/
+            chmod -R 755 ${CHROOT}${UROOT}/bin
+            echo "please edit jessie.build.usermount script to mount your running device"
+            . jessie.build.usermount
+        else
+            echo "devel mode"
+            if mount --bind /data/data/u.root/usr/src/ ${CHROOT}/usr/src
+            then
+                echo found source tree
+            else
+                echo not source tree
+            fi
+            mkdir -p ${CHROOT}/data/data ${CHROOT}/data/target
+            mount --bind /data/${ARCH} ${CHROOT}/data/data
+            mount --bind /data/target ${CHROOT}/data/target
+        fi
     fi
 
-    for mnt in dev/pts dev proc tmp sys
-    do
-	        umount -f ${CHROOT}/$mnt 2>/dev/null
-    done
-
-    for mnt in proc tmp sys dev dev/pts
-    do
-	    mkdir -p ${CHROOT}/$mnt
-	    mount --bind /$mnt ${CHROOT}/$mnt
-    done
-
     export debian_chroot=\(${ARCH}\)${CHROOT}
-    export INPUTRC=${UROOT}/etc/inputrc
     export HOME=${UROOT}
 
     for ENV in $(env|grep ^LC_|cut -f1 -d=)
@@ -42,15 +61,22 @@ then
     export LANG=C.UTF-8
     export LC_ALL=C
     export WORKDIR=/usr/src
+    export QEMU_AUDIO_DRV=pa
+    export QEMU_PA_SOURCE=input
+    export PREFIX=${UROOT}/usr
+    export PKG_CONFIG_PATH=${PREFIX}/lib/pkgconfig:${PREFIX}/share/pkgconfig
 
-    LD_LIBRARY_PATH=${UROOT}/lib/{TRIPLE} \
+    LD_LIBRARY_PATH=${UROOT}/lib/${TRIPLE}:${UROOT}/lib \
         PATH=/usr/sbin:/usr/bin:/sbin:/bin:${UROOT}/bin \
         /usr/sbin/chroot ${CHROOT} /bin/bash --rcfile ${UROOT}/etc/bash.bashrc
 
 
     chroot ${CHROOT} $1 $2 $3 $4 $5 $6 $7 $8 $9
 
-    for mnt in dev/pts dev proc tmp sys
+    #
+    echo "FIXME reenter refcount"
+
+    for mnt in  data/data data/target usr/src data/data/u.root dev/pts dev proc tmp sys
     do
 	    umount -f ${CHROOT}/$mnt || echo $mnt was not mounted
     done
