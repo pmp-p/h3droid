@@ -149,3 +149,8 @@ libsqlite3-dev
 libmpdec-dev
 libreadline-dev
 libclang-3.5-dev
+libbz2-dev
+libsigc++-2.0-dev
+libunistring-dev
+uuid-dev
+libblkid-dev
