@@ -22,9 +22,13 @@
   gcc/g++ 4.9 *ONBOARD*
   
   Python3.5
+  
   Embeddable Python3.5 ( via jni and gradle build system *not on board* ) 
+  
   micropython
+  
   libffi
+  
   c2ffi
 
 
