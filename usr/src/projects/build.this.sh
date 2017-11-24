@@ -21,7 +21,7 @@ echo "
 "
 
 
-adb="${BIN}/adb -s ${ADB_HOST}"
+
 
 #cd src/main/jni; /SDK/android/crystax/ndk-build ; cd ..;cd ..; cd ..
 
