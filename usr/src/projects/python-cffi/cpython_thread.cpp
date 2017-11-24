@@ -44,13 +44,10 @@ int interpreter_launch(int argc, char *argv[]){
     thread_args->vbool = true;
     thread_args->pchar = (char *)argv;
 
-    // data/data/u.root/usr/lib/python3.5/stdlib.zip";
     void* core = 0;
-
 
     char corepath[] = LIB_PYTHON;
     core = dlopen(corepath, RTLD_LAZY);
-
 
     if (core == 0) {
         const char* lasterr = dlerror();
@@ -59,10 +56,6 @@ int interpreter_launch(int argc, char *argv[]){
         LOGP("interpreter_launch: starting 1 python instance");
         pthread_create(&thread_args->thread_id, NULL, interpreter_thread, (void*)thread_args);
     }
-/*
-        LOGP("interpreter_launch: starting 1 python instance");
-        pthread_create(&thread_args->thread_id, NULL, interpreter_thread, (void*)thread_args);
-*/
     return 0;
 }
 
