@@ -14,9 +14,25 @@
 // limitations under the License.
 //
 
+/**
+ * PANDA 3D SOFTWARE
+ * Copyright (c) Carnegie Mellon University.  All rights reserved.
+ *
+ * All use of this software is subject to the terms of the revised BSD
+ * license.  You should have received a copy of this license along
+ * with this source code in a file named "LICENSE."
+ *
+ * @file NativeIStream.java
+ * @author rdb
+ * @date 2013-01-22
+ */
+
+
 package u.r.p3d;
 
 import android.app.Activity;
+//import android.app.NativeActivity;
+
 import android.os.Bundle;
 import android.widget.Toast;
 import android.view.Surface;
@@ -27,10 +43,34 @@ import android.view.View.OnClickListener;
 import android.util.Log;
 
 
-public class EglRuntime extends Activity implements SurfaceHolder.Callback
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import u.r.p3d.NativeIStream;
+
+public class EglRuntime extends /*Native*/Activity implements SurfaceHolder.Callback
 {
 
     private static String TAG = "EglRuntime";
+
+    protected static BitmapFactory.Options readBitmapSize(long istreamPtr) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        options.inScaled = false;
+        NativeIStream stream = new NativeIStream(istreamPtr);
+        BitmapFactory.decodeStream(stream, null, options);
+        return options;
+    }
+
+    protected static Bitmap readBitmap(long istreamPtr, int sampleSize) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        // options.inPreferredConfig = Bitmap.Config.RGBA_8888;
+        options.inScaled = false;
+        options.inSampleSize = sampleSize;
+        NativeIStream stream = new NativeIStream(istreamPtr);
+        return BitmapFactory.decodeStream(stream, null, options);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,8 +84,8 @@ public class EglRuntime extends Activity implements SurfaceHolder.Callback
         surfaceView.setOnClickListener(new OnClickListener() {
                 public void onClick(View view) {
                     Toast toast = Toast.makeText(EglRuntime.this,
-                                                 "This demo combines Java UI and native EGL + OpenGL renderer",
-                                                 Toast.LENGTH_LONG);
+                                         "This demo combines Java UI and python running panda3d native EGL renderer",
+                                         Toast.LENGTH_LONG);
                     toast.show();
                 }});
     }
@@ -88,7 +128,6 @@ public class EglRuntime extends Activity implements SurfaceHolder.Callback
     public void surfaceDestroyed(SurfaceHolder holder) {
         nativeSetSurface(null);
     }
-
 
     public static native void nativeOnStart();
     public static native void nativeOnResume();
