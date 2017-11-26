@@ -31,7 +31,7 @@ static char *root_folder = "/data/data/u.r";
 ============================================================================================
 */
 
-extern int interpreter_prepare();
+extern "C" int interpreter_prepare();
 
 
 static PyObject *androidembed_log(PyObject *self, PyObject *args) {
@@ -81,14 +81,12 @@ int interpreter_main(int argc, char *argv[] ){
 
     str_cp[512]=0;
 
-
-    LOGP("Preparing Python for Android");
+    LOGP("Preparing Embed for Python for Android");
     if (interpreter_prepare()<0)
         return -1;
 
     LOGP("Initializing Python for Android");
 
-    setenv("PANDA_PRC_PATH", "/data/data/u.r/etc", 1);
     setenv("XDG_CONFIG_HOME", "/data/data/u.r/XDG_CONFIG_HOME", 1);
     setenv("XDG_CACHE_HOME", "/data/data/u.r/XDG_CACHE_HOME", 1);
     setenv("PYTHONDONTWRITEBYTECODE","1",1);
