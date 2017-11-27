@@ -8,3 +8,5 @@ https://github.com/vstinner : you know where ;)
 requires:
 
 ndk 14b
+
+WILL NOT WORK WITH CRYSTAX use 3.5 instead if you need crystax !
