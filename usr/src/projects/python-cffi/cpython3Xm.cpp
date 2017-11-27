@@ -1,9 +1,11 @@
-#ifndef PY_LOG
+#ifndef PYVER
     #include "cpython35m.h"
 #endif
 
-static char *root_folder = "/data/data/u.r";
-
+#ifndef root_folder
+    #warning  ============== using hardcoded app path  ==============
+    static char *root_folder = "/data/data/u.r";
+#endif
 
 #define PY_SSIZE_T_CLEAN
 #include "Python.h"
@@ -27,12 +29,9 @@ static char *root_folder = "/data/data/u.r";
 
 #include <locale.h>
 
-/*
-============================================================================================
-*/
-
-extern "C" int interpreter_prepare();
-
+#ifndef INTERPRETER
+    extern "C" int interpreter_prepare();
+#endif
 
 static PyObject *androidembed_log(PyObject *self, PyObject *args) {
     char *logstr = NULL;
@@ -48,7 +47,6 @@ static PyMethodDef AndroidEmbedMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
-//static struct PyModuleDef androidembed = {PyModuleDef_HEAD_INIT, "androidembed", "", -1, AndroidEmbedMethods};
 static struct PyModuleDef androidembed = {PyModuleDef_HEAD_INIT, "androidembed", NULL, -1, AndroidEmbedMethods};
 
 PyMODINIT_FUNC initandroidembed(void) {
@@ -77,15 +75,17 @@ int interpreter_main(int argc, char *argv[] ){
     char *env_logname = PY_LOG;
     char str_cp[513];
     int ret = 0;
-    FILE *fd;
+    FILE *fd = NULL;
 
     str_cp[512]=0;
 
-    LOGP("Preparing Embed for Python for Android");
+#ifndef INTERPRETER
+    LOGP("Preparing Embed for Python3 for Android");
     if (interpreter_prepare()<0)
         return -1;
+#endif
 
-    LOGP("Initializing Python for Android");
+    LOGP("Initializing Python3 for Android");
 
     setenv("XDG_CONFIG_HOME", "/data/data/u.r/XDG_CONFIG_HOME", 1);
     setenv("XDG_CACHE_HOME", "/data/data/u.r/XDG_CACHE_HOME", 1);
@@ -100,16 +100,15 @@ int interpreter_main(int argc, char *argv[] ){
 
  /* our logging module for android */
 
-#ifdef PY37
+#if PYVER > 36
     setlocale(LC_ALL, "C");
     //LOGP("SKIP: PyImport_AppendInittab(androidembed, initandroidembed);");
     //PyImport_AppendInittab("androidembed", initandroidembed);
-
-#else
+#endif
 
     LOGP("ADDING: PyImport_AppendInittab(androidembed, initandroidembed);");
     PyImport_AppendInittab("androidembed", initandroidembed);
-#endif
+
 
     LOGP("Preparing to initialize python");
 
@@ -120,7 +119,8 @@ int interpreter_main(int argc, char *argv[] ){
     }
 
 
-    LOGP("crystax python folder exists");
+    LOGP("Python stdlib folder found at :");
+    LOGP(PY_LIB);
     char paths[256];
 
     snprintf(paths, 512,
@@ -130,24 +130,12 @@ int interpreter_main(int argc, char *argv[] ){
     LOGP("calculated paths to be...");
     LOGP(paths);
 
-#ifdef PY37
-    wchar_t *wchar_paths = (wchar_t *)paths;
-    LOGP("Initialize python");
-    Py_Initialize();
-
-    LOGP("ADDING: PyImport_AppendInittab(androidembed, initandroidembed);");
-    PyImport_AppendInittab("androidembed", initandroidembed);
-
-    LOGP("Setting wchar paths...");
-    Py_SetPath(wchar_paths);
-#else
     wchar_t *wchar_paths = Py_DecodeLocale(paths, NULL);
     LOGP("Setting wchar paths...");
     Py_SetPath(wchar_paths);
 
     LOGP("Initialize python");
     Py_Initialize();
-#endif
 
     LOGP("Initialized python");
 
@@ -161,8 +149,6 @@ int interpreter_main(int argc, char *argv[] ){
     LOGP("</LogTest>");
 
     /* inject our bootstrap code to redirect python stdin/stdout replace sys.path with our path */
-
-
 
     PyRun_SimpleString(
         "import sys\n"
@@ -182,6 +168,7 @@ int interpreter_main(int argc, char *argv[] ){
         PyRun_SimpleString(str_cp);
     }
 
+
     /* run python !   */
 
 
@@ -191,6 +178,7 @@ int interpreter_main(int argc, char *argv[] ){
     PyRun_SimpleString(
         "print('interpreter:',sys.argv)\n"
     );
+
     if (argc>1){
         fd = fopen( argv[1], "r");
         if (fd == NULL) {
@@ -264,7 +252,8 @@ int interpreter_main(int argc, char *argv[] ){
 
   /* close everything  */
     Py_Finalize();
-    fclose(fd);
+    if (fd)
+        fclose(fd);
 
     LOGP("Python for android ended.");
 

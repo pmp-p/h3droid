@@ -4,5 +4,6 @@
 #define PY_LIB "/data/data/u.r/usr/lib/python3.5"
 #define PY_LIBS "/data/data/u.r/usr/lib/python3.5:/data/data/u.r/usr/lib/python3"
 
+#define PYVER 35
 
-#define PY_LOG "Python3.5"
+#define PY_LOG "Python3.5m"
