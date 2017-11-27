@@ -1,0 +1,11 @@
+--- host/setup.py	2017-11-25 18:48:48.000000000 +0100
++++ armv7a/setup.py	2017-11-26 22:32:16.147480680 +0100
+@@ -2054,7 +2054,7 @@
+         if ffi_inc and ffi_lib:
+             ext.include_dirs.extend(ffi_inc)
+             ext.libraries.append(ffi_lib)
+-            self.use_system_libffi = True
++        self.use_system_libffi = True
+ 
+     def _decimal_ext(self):
+         extra_compile_args = []

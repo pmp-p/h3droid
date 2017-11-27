@@ -1,0 +1,11 @@
+--- host/pyconfig.h.in	2017-11-25 18:48:48.000000000 +0100
++++ armv7a/pyconfig.h.in	2017-11-27 01:05:21.779699797 +0100
+@@ -233,7 +233,7 @@
+ #undef HAVE_DEV_PTC
+ 
+ /* Define to 1 if you have the /dev/ptmx device file. */
+-#undef HAVE_DEV_PTMX
++#define HAVE_DEV_PTMX 1
+ 
+ /* Define to 1 if you have the <direct.h> header file. */
+ #undef HAVE_DIRECT_H

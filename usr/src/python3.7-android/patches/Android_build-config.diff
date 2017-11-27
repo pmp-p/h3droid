@@ -1,0 +1,13 @@
+--- host/Android/build-config	2017-11-25 18:48:48.000000000 +0100
++++ armv7a/Android/build-config	2017-11-26 19:30:32.383220578 +0100
+@@ -21,8 +21,8 @@
+     build_config_error "The installed NDK version is $version but version $ndk_version is required."
+ unset ndk_version version
+ 
+-test $((ANDROID_API)) -lt 21 && \
+-    build_config_error "\$ANDROID_API ($ANDROID_API) must be 21 or greater."
++test $((ANDROID_API)) -lt 19 && \
++    build_config_error "\$ANDROID_API ($ANDROID_API) must be 19+2 or greater."
+ test $((ANDROID_API)) -lt 24 && test "$ANDROID_ARCH" = arm64 && \
+     build_config_error "Cannot build or run arm64 at an API level less than 24."
+ 
