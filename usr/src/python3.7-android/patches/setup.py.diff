@@ -6,7 +6,7 @@
              ext.libraries.append(ffi_lib)
 -            self.use_system_libffi = True
 +        self.use_system_libffi = True
-#see https://bugs.python.org/issue31710
++#see https://bugs.python.org/issue31710
 
      def _decimal_ext(self):
          extra_compile_args = []
