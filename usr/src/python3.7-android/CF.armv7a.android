@@ -1,0 +1,33 @@
+#!/bin/bash
+unset DEVICE_PREFIXES
+export ANDROID_NDK_ROOT=/data/data/u.root/android/ndk
+export DESTDIR=/
+
+# readline 6.3 7.0 fail
+#export WITH_LIBRARIES="libffi,ncurses,openssl,sqlite,readline"
+
+# sqlite3 compile to host instead of target ...
+#
+#export WITH_LIBRARIES="libffi,ncurses,openssl,sqlite"
+
+export WITH_LIBRARIES="libffi,ncurses,openssl"
+
+export CONFIG_SITE=config.site
+
+export PYTHONDONTWRITEBYTECODE=1
+export ANDROID_API=19
+export ANDROID_ARCH=armv7
+
+export CFLAGS="-fPIE -fPIC -Wno-multichar -funwind-tables -Wl,--no-merge-exidx-entries"
+export CPPFLAGS="-I/data/data/u.root/usr/include -L/data/data/u.r/lib-armhf"
+
+cat >config.site <<END
+ac_cv_file__dev_ptmx=yes
+ac_cv_file__dev_ptc=no
+ac_cv_enable_implicit_function_declaration_error=yes
+END
+
+
+./configure-android --prefix=/data/data/u.r/usr --libdir=/data/data/u.r/lib-armhf \
+ --without-ensurepip --with-pydebug --with-libs="-llog -landroid"\
+ --with-c-locale-coercion --disable-ipv6 --with-computed-gotos --with-system-ffi --enable-shared
