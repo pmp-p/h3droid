@@ -1,0 +1,35 @@
+# Red Gear Controller
+# VID_2563&PID_0523
+# android bindind by eggnot for H3Droid
+
+key 290   BUTTON_A
+key 291   BUTTON_B
+key 289   BUTTON_X
+key 288   BUTTON_Y
+key 292   BUTTON_L1
+key 293   BUTTON_R1
+
+key 296   BUTTON_SELECT
+key 297   BUTTON_START
+
+key 298   BUTTON_THUMBL
+key 299   BUTTON_THUMBR
+
+# Left and right stick.
+
+# Joystick and game controller axes.
+# Axes that are not mapped will be assigned generic axis numbers by the input subsystem.
+axis 0x00 X
+axis 0x01 Y
+axis 0x02 Z
+axis 0x03 RX
+axis 0x04 RY
+axis 0x05 RZ
+
+# Triggers.
+#key 294 LTRIGGER
+#key 295 RTRIGGER
+
+# Hat.
+axis 0x10 HAT_X
+axis 0x11 HAT_Y
