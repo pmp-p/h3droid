@@ -1,15 +1,20 @@
-Some support for programs i'd like to have on everyday h3droid
+uroot Terminal with mouse supports :
+  
+ tilde   the great editor.
+ Python 3.5 (crystax) + numpy
+ Python 3.7 (built from official android bpo) + python prompt toolkit
+ micropython with some ffi modules to show i2c/gpio caps.
+ TurboVNC server
+ 
+ Python sl4a support.
+ Panda3D the c++/python 3d engine.
 
-panda3d
-
-python 3.5 (crystax) / 3.7 (built from official)
-
-some python modules.
+ bash   4.4.12(2)
+ 
+ up2date busybox with + some extra like "file", ndk-depends ....
 
 
-micropython.
-
-some micropython libs mostly c2ffi ones to do gpio stuff fast.
+ an etc/rc.d for h3droid ( link etc/rc.local as /data/rc.local ) with usefull rc scripts
 
 
 
