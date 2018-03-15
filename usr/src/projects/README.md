@@ -16,6 +16,5 @@ uroot Terminal with mouse supports :
 * an etc/rc.d for h3droid ( link etc/rc.local as /data/rc.local ) with usefull rc scripts
 
 
+[![PayPayl](https://raw.githubusercontent.com/pmp-p/h3droid/sdk/usr/src/projects/b0.png)](http://paypal.me/pmpp)
 
-
-[![PayPayl](https://img.shields.io/badge/Paypal-Me-yellow.svg)](http://paypal.me/pmpp)
